@@ -35,14 +35,24 @@ CANChannel can(CAN_D1_D2);
 
 float canDistanceValue = 0;
 unsigned long lastSendTime = 0;
-#define SEND_DELAY_MS 1000
 bool led_state = false;
 
+STARTUP(System.enableFeature(FEATURE_RETAINED_MEMORY));
 
-//PRODUCT_ID(4181);
+
+//
+//  PRODUCT SETTINGS
+//
+
+//PRODUCT_ID(4211);
 //PRODUCT_VERSION(1);
 
-STARTUP(System.enableFeature(FEATURE_RETAINED_MEMORY));
+//
+//  How often do we use the CAN-BUS to synchronize LEDs?
+//
+
+#define SEND_DELAY_MS 100
+
 
 
 
@@ -80,12 +90,6 @@ time_t lastIdleCheckin = 0;
 void setup() {
     // mirror RGB PINS
     RGB.mirrorTo(B3,B2,B1,true, true);
-
-//    // POWER TEMPERATURE SENSOR
-//	pinMode(A1,OUTPUT);
-//    pinMode(B5,OUTPUT);
-//    digitalWrite(B5, HIGH);
-//    digitalWrite(A1, LOW);
 
     // water sensor
     pinMode(A1, OUTPUT);
@@ -191,28 +195,11 @@ void loop() {
     }
 
 
-//    // use "now" instead of millis...  If it takes us a REALLY long time to connect, we don't want to
-//    // accidentally idle out.
-//    if ((now - lastMotion) > NO_MOTION_IDLE_SLEEP_DELAY) {
-//        // hey, it's been longer than xx minutes and nothing is happening, lets go to sleep.
-//        // if the accel triggers an interrupt, we'll wakeup earlier than that.
-//
-//        Particle.publish(MY_NAME + String("_status"), "sleeping!");
-//
-//        lastPublish = 0;
-//        lastMotion = 0;
-//
-//        // Hey GPS, please stop using power, kthx.
-//        digitalWrite(D6, HIGH);
-//
-//        // lets give ourselves a chance to settle, deal with anything pending, achieve enlightenment...
-//        delay(10*1000);
-//        System.sleep(SLEEP_MODE_DEEP, HOW_LONG_SHOULD_WE_SLEEP);
-//    }
-
-
     publishLevel();
 
+    //
+    //  How often do we use the CAN-BUS to synchronize LEDs?
+    //
     if ((now - lastSendTime) > SEND_DELAY_MS) {
         lastSendTime = now;
 
